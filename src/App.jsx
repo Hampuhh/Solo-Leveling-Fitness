@@ -9,9 +9,9 @@ import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged }
 import { getFirestore, doc, setDoc, collection, onSnapshot, addDoc, serverTimestamp, updateDoc, deleteDoc } from 'firebase/firestore';
 
 // --- FIREBASE INITIALIZATION ---
-// Preparado para exportar a GitHub. Si __firebase_config no existe, usará tu configuración local.
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-  // apiKey: "AIzaSyCw9Y0w0Ry6AC1qI0Ip-UrNAnDL5T1LO7U",
+  // ⚠️ ATENCIÓN CAZADOR: PEGA AQUÍ TUS DATOS REALES DE FIREBASE ⚠️
+  apiKey: "AIzaSyCw9Y0w0Ry6AC1qI0Ip-UrNAnDL5T1LO7U",
   authDomain: "solo-leveling-fitness-1ddf4.firebaseapp.com",
   projectId: "solo-leveling-fitness-1ddf4",
   storageBucket: "solo-leveling-fitness-1ddf4.firebasestorage.app",
@@ -22,7 +22,7 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'solo-leveling-fit-ultimate-v3';
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'solo-leveling-fit-ultimate-v4';
 
 // --- AUDIO ASSETS ---
 const BGM_URL = "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=epic-battle-114876.mp3"; 
@@ -35,6 +35,52 @@ const playSound = (url) => {
   audio.play().catch(e => console.log("Audio blocked by browser", e));
 };
 
+// ==========================================
+// PANTALLA DE INICIO (SPLASH SCREEN)
+// ==========================================
+function SplashScreen({ onStart }) {
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden selection:bg-blue-900">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/90 to-slate-950 animate-[spin_60s_linear_infinite] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none"></div>
+
+      <div className="z-10 text-center animate-fade-in-up flex flex-col items-center">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
+          <Zap className="w-24 h-24 text-blue-500 relative animate-bounce-slow filter drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+        </div>
+        
+        <h1 className="text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-blue-500 mb-2 uppercase filter drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
+          Sistema
+        </h1>
+        <p className="text-blue-300 font-mono tracking-[0.3em] uppercase text-xs mb-16 opacity-80 shadow-blue-500/50">
+          Nivelación en Solitario
+        </p>
+
+        <button
+          onClick={onStart}
+          className="relative inline-flex h-14 active:scale-95 transition-transform overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900 group"
+        >
+          <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#60a5fa_0%,#c084fc_50%,#60a5fa_100%)] group-hover:bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#a855f7_50%,#3b82f6_100%)]" />
+          <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-10 py-1 text-sm font-black uppercase tracking-widest text-white backdrop-blur-3xl transition-colors hover:bg-slate-900/90 gap-2">
+            Despertar <Zap size={16} className="text-blue-400 animate-pulse" />
+          </span>
+        </button>
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        .animate-fade-in-up { animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-bounce-slow { animation: bounceSlow 3s ease-in-out infinite; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounceSlow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+      `}} />
+    </div>
+  );
+}
+
+// ==========================================
+// APP PRINCIPAL
+// ==========================================
 export default function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -42,9 +88,11 @@ export default function App() {
   const [quests, setQuests] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [foodLogs, setFoodLogs] = useState([]);
+  
   const [activeTab, setActiveTab] = useState('status');
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   
   const [penaltyMessage, setPenaltyMessage] = useState('');
   const [systemAlert, setSystemAlert] = useState(null);
@@ -152,6 +200,14 @@ export default function App() {
   }, [user]);
 
   // --- HANDLERS ---
+  const handleStartSystem = () => {
+    playSound(CLICK_SFX);
+    setShowSplash(false);
+    if (audioRef.current) {
+      audioRef.current.play().then(() => setIsMusicPlaying(true)).catch(e => console.log(e));
+    }
+  };
+
   const toggleMusic = () => {
     playSound(CLICK_SFX);
     if (audioRef.current) {
@@ -172,10 +228,14 @@ export default function App() {
     setTimeout(() => setSystemAlert(null), 4000);
   };
 
-  // Prevenir renderizado de componentes si el usuario se está deslogueando o no existe
+  // --- RENDER ---
+  if (showSplash) {
+    return <SplashScreen onStart={handleStartSystem} />;
+  }
+
   if (isLoading || !user) return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center text-blue-500">
-      <Zap className="w-12 h-12 animate-bounce" />
+      <Zap className="w-12 h-12 animate-bounce filter drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
     </div>
   );
 
@@ -191,20 +251,20 @@ export default function App() {
       <div className="w-full max-w-md bg-slate-900 min-h-screen relative shadow-2xl shadow-blue-900/20 md:border-x border-blue-900/30 overflow-hidden flex flex-col">
         
         {/* HEADER */}
-        <header className="bg-slate-950 border-b border-blue-800/50 p-4 sticky top-0 z-30 flex justify-between items-center">
+        <header className="bg-slate-950 border-b border-blue-800/50 p-4 sticky top-0 z-30 flex justify-between items-center shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
           <div className="flex items-center gap-2">
             <Zap className="text-blue-500 w-6 h-6 animate-pulse" />
-            <h1 className="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 uppercase">
+            <h1 className="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 uppercase">
               El Sistema
             </h1>
           </div>
           <div className="flex gap-2">
-            <button onClick={toggleMusic} className={`p-2 rounded-full border ${isMusicPlaying ? 'border-blue-500 text-blue-400' : 'border-slate-700 text-slate-500'}`}>
-              {isMusicPlaying ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            <button onClick={toggleMusic} className={`p-2 rounded-full border transition-all duration-300 ${isMusicPlaying ? 'border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-slate-700 text-slate-500 hover:text-slate-300'}`}>
+              {isMusicPlaying ? <Volume2 size={18} className="animate-pulse" /> : <VolumeX size={18} />}
             </button>
             {profile && (
-              <button onClick={() => navChange('settings')} className={`p-2 rounded-full border transition-all ${activeTab === 'settings' ? 'border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'border-slate-700 text-slate-500 hover:text-slate-300'}`}>
-                <Settings size={18} />
+              <button onClick={() => navChange('settings')} className={`p-2 rounded-full border transition-all duration-300 ${activeTab === 'settings' ? 'border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)] bg-blue-900/20' : 'border-slate-700 text-slate-500 hover:text-slate-300'}`}>
+                <Settings size={18} className={activeTab === 'settings' ? 'animate-[spin_4s_linear_infinite]' : ''} />
               </button>
             )}
           </div>
@@ -222,8 +282,8 @@ export default function App() {
 
         {/* PENALTY MESSAGE */}
         {penaltyMessage && (
-          <div className="absolute top-20 left-0 w-full z-40 p-4 animate-fade-in">
-            <div className="bg-red-950/90 border border-red-500 p-4 rounded-md shadow-[0_0_30px_rgba(239,68,68,0.5)] flex items-start gap-3 backdrop-blur-sm">
+          <div className="absolute top-20 left-0 w-full z-40 p-4 animate-fade-in-down">
+            <div className="bg-red-950/95 border border-red-500 p-4 rounded-md shadow-[0_0_30px_rgba(239,68,68,0.6)] flex items-start gap-3 backdrop-blur-md">
               <AlertTriangle className="text-red-500 w-6 h-6 shrink-0 animate-pulse" />
               <p className="text-red-200 text-sm font-bold tracking-wide leading-relaxed">{penaltyMessage}</p>
             </div>
@@ -234,13 +294,13 @@ export default function App() {
         {systemAlert && (
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-11/12 z-50 animate-popup pointer-events-none">
             <div className={`border p-6 rounded-lg shadow-2xl backdrop-blur-md text-center ${
-              systemAlert.type === 'success' ? 'bg-blue-950/95 border-blue-400 shadow-blue-500/50' :
-              systemAlert.type === 'reward' ? 'bg-yellow-950/95 border-yellow-400 shadow-yellow-500/50' :
-              'bg-purple-950/95 border-purple-400 shadow-purple-500/50'
+              systemAlert.type === 'success' ? 'bg-blue-950/95 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.6)]' :
+              systemAlert.type === 'reward' ? 'bg-yellow-950/95 border-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6)]' :
+              'bg-purple-950/95 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.6)]'
             }`}>
               <div className="flex justify-center mb-3">
-                {systemAlert.type === 'success' ? <CheckCircle className="w-12 h-12 text-blue-400 animate-pulse" /> : 
-                 systemAlert.type === 'reward' ? <Award className="w-12 h-12 text-yellow-400 animate-bounce" /> :
+                {systemAlert.type === 'success' ? <CheckCircle className="w-12 h-12 text-blue-400 animate-bounce" /> : 
+                 systemAlert.type === 'reward' ? <Award className="w-12 h-12 text-yellow-400 animate-[spin_3s_linear_infinite]" /> :
                  <Zap className="w-12 h-12 text-purple-400 animate-pulse" />}
               </div>
               <h2 className={`text-xl font-black uppercase tracking-widest mb-2 ${
@@ -253,7 +313,7 @@ export default function App() {
         )}
 
         {/* CONTENT AREA */}
-        <main className="flex-1 p-4 overflow-y-auto custom-scrollbar relative z-10">
+        <main className="flex-1 p-4 overflow-y-auto custom-scrollbar relative z-10 scroll-smooth">
           {!profile ? (
             <AwakeningScreen user={user} setProfile={setProfile} playSound={playSound} />
           ) : (
@@ -270,7 +330,7 @@ export default function App() {
 
         {/* BOTTOM NAV */}
         {profile && (
-          <nav className="fixed bottom-0 w-full max-w-md bg-slate-950 border-t border-blue-900/50 flex justify-around p-2 z-30 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
+          <nav className="fixed bottom-0 w-full max-w-md bg-slate-950/95 backdrop-blur-md border-t border-blue-900/50 flex justify-around p-2 z-30 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
             <NavItem icon={<User />} label="Estado" isActive={activeTab === 'status'} onClick={() => navChange('status')} />
             <NavItem icon={<Activity />} label="Físico" isActive={activeTab === 'log'} onClick={() => navChange('log')} />
             <NavItem icon={<Flame />} label="Energía" isActive={activeTab === 'food'} onClick={() => navChange('food')} />
@@ -286,7 +346,9 @@ export default function App() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .animate-popup { animation: popupAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popupAnim { 
           0% { opacity: 0; transform: translateX(-50%) scale(0.8) translateY(20px); } 
           50% { transform: translateX(-50%) scale(1.05) translateY(0); }
