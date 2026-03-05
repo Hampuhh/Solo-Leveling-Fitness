@@ -1,15 +1,24 @@
 {
-  "name": "Sistema Fitness",
-  "short_name": "Sistema",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#1e3a8a",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/5202/5202951.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+"short_name": "Sistema",
+"name": "Solo Leveling: El Sistema",
+"description": "Aplicación de Nivelación de Atributos Físicos",
+"icons": [
+{
+"src": "https://www.google.com/url?sa=E&source=gmail&q=https://cdn-icons-png.flaticon.com/512/5202/5202951.png",
+"type": "image/png",
+"sizes": "512x512",
+"purpose": "any maskable"
+},
+{
+"src": "https://www.google.com/search?q=https://cdn-icons-png.flaticon.com/512/11542/11542385.png",
+"type": "image/png",
+"sizes": "192x192"
+}
+],
+"start_url": "/",
+"background_color": "#020617",
+"display": "standalone",
+"scope": "/",
+"theme_color": "#1e40af",
+"orientation": "portrait"
 }
