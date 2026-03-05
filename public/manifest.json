@@ -1,0 +1,15 @@
+{
+  "name": "Sistema Fitness",
+  "short_name": "Sistema",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5202/5202951.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
