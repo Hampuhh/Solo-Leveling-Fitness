@@ -341,9 +341,27 @@ export default function App() {
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 10px; }
+        /* --- ESTILOS NATIVOS (Sin scrollbar, sin pull-to-refresh, sin selección) --- */
+        body {
+          overscroll-behavior-y: none; /* Evita el "pull-to-refresh" en celulares */
+          -webkit-tap-highlight-color: transparent; /* Quita el cuadro azul al tocar botones */
+          user-select: none; /* Evita seleccionar texto por accidente al tocar */
+          -webkit-user-select: none;
+        }
+        input, select, textarea {
+          user-select: auto; /* Permite escribir normalmente en los campos de texto */
+          -webkit-user-select: auto;
+        }
+        
+        /* Oculta la barra de scroll pero permite seguir deslizando con el dedo */
+        .custom-scrollbar {
+          -ms-overflow-style: none;  /* IE y Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .custom-scrollbar::-webkit-scrollbar { 
+          display: none; /* Chrome, Safari y Opera */
+        }
+
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .animate-popup { animation: popupAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
