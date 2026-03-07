@@ -15,11 +15,10 @@
       "sizes": "192x192"
     }
   ],
-  "start_url": "/Solo-Leveling-Fitness/",
-  "scope": "/Solo-Leveling-Fitness/",
+  "start_url": ".",
+  "scope": ".",
   "background_color": "#020617",
   "display": "standalone",
   "theme_color": "#1e40af",
   "orientation": "portrait"
 }
-```
